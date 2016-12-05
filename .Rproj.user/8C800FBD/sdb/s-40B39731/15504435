@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "setwd(\"~/Desktop\")\njobsite <- read.csv(\"jobsite_data.csv\", header=TRUE)\nFullDescription <- table(jobsite$FullDescription)\nCategory <- table(jobsite$Category)\n\nlibrary(plyr)\ntrain <- ddply(cv_library, c(\"Id\"), summarise, FullDescription, Category)\ntrain <- data.frame(cv_library)\ntraining <- train[,c(3,9)]\ntraining_des <- train[,c(3)]\nwrite.csv(training, file=\"training\")\n\n#training1 <- do.call(\"rbind\", lapply(training, as.data.frame))\nlibrary(tm)\ndim(training)\n\nmyCorpus <- Corpus(VectorSource(jobsite$FullDescription))\nmyCorpus <- tm_map(myCorpus, content_transformer(tolower), lazy=TRUE)\nremoveURL <- function(x) gsub(\"http[^[:space:]]*\", \"\", x)\nmyCorpus <- tm_map(myCorpus, content_transformer(removeURL))\n# remove punctuation\nmyCorpus <- tm_map(myCorpus, removePunctuation, lazy=TRUE)\n# remove numbers\nmyCorpus <- tm_map(myCorpus, removeNumbers, lazy=TRUE)\n\n#remove anything other than English letters or space\nremoveNumPunct <- function(x) gsub(\"[^[:alpha:][:space:]]*\", \"\", x)\nmyCorpus <- tm_map(myCorpus, content_transformer(removeNumPunct))\n# remove stopwords\n# keep \"r\" by removing it from stopwords\nmyStopwords <- c(stopwords('english'), \"available\", \"via\", \"will\")\nidx <- which(myStopwords == \"r\")\nmyStopwords <- myStopwords[-idx]\nmyCorpus <- tm_map(myCorpus, removeWords, myStopwords, lazy=TRUE)\n\ndictCorpus <- myCorpus\n# stem words in a text document with the snowball stemmers,\n# which requires packages Snowball, RWeka, rJava, RWekajars\nmyCorpus <- tm_map(myCorpus, stemDocument)\n\n## 75% of the sample size\n#myDtmTFIDF.DT <- data.frame(text=unlist(sapply(myDtmTFIDF, `[`, \"content\")), stringsAsFactors=F)\n#myCorpus.DT <- as.data.frame(inspect(myCorpus))\nsmp_size <- floor((nrow(ModelingData)/4)*3)\n\n## set the seed to make your partition reproductible\nset.seed(123)\ntrain_ind <- sample(seq_len(nrow(ModelingData)), size = smp_size)\n\nModelingData_train <- ModelingData[train_ind, ]\nModelingData_test <- ModelingData[-train_ind, ]\nmyDtmTFIDF_train <- Corpus(VectorSource(myDtmTFIDF_train))\nmyDtmTFIDF_test <- Corpus(VectorSource(myDtmTFIDF_test))\n# inspect the first three ``documents\"\ninspect(myCorpus[1:3])\n#TF, TF-IDF\nmyDtm <- DocumentTermMatrix(myCorpus, control=list(wordLengths=c(1, Inf),bounds=list(global=c(floor(length(myCorpus)*0.05), Inf))))\n#myDtm_test <- DocumentTermMatrix(myCorpus_test, control=list(wordLengths=c(1,Inf),bounds=list(global=c(floor(length(myCorpus_train)*0.05), Inf))))\nmyDtmTFIDF <- DocumentTermMatrix(myCorpus, control = list(weighting=function(x)weightTfIdf(x, normalize=FALSE),stopwords=TRUE))\nmyDtmTFIDF <- removeSparseTerms(myDtmTFIDF, 0.7)\n\n#myDtmTFIDF_test <- DocumentTermMatrix(myCorpus_test, control = list(weighting=function(x)weightTfIdf(x, normalize=FALSE),stopwords=TRUE))\n#myDtmTFIDF_test <- removeSparseTerms(myDtmTFIDF_test, 0.7)\nmyDtmTFIDF.DT <- as.data.frame(inspect(myDtmTFIDF))\n\n#knn.pred <- summary(knn(myDtmTFIDF_train, myDtmTFIDF_test, category, k=3))\ninspect(myDtmTFIDF_train[266:270,31:40])\n\n\nfindFreqTerms(ModelingData, lowfreq=10)\nlibrary(wordcloud)\n\n# calculate the frequency of words\nwordcloud(myCorpus, scale=c(4,0.2), max.words=100, random.order=FALSE, rot.per=0.35, use.r.layout=FALSE, colors=brewer.pal(8, \"Dark2\"))\n\nlibrary(e1071)\n\nx <- subset(ModelingData_1, select = -Category)\ny <- ModelingData_1$Category\nmodel <- svm(x, y)\npred_result <- predict(model, x)\ntable(pred_result,y)\n\n",
+    "created" : 1480741126007.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1083081810",
+    "id" : "15504435",
+    "lastKnownWriteTime" : 1435016947,
+    "last_content_update" : 1435016947,
+    "path" : "~/R/new/new.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

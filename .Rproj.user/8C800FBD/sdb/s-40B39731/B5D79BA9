@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "library(jiebaR)\nsetwd(\"~/R/Rjieba\")\n#Accept default parameter and bulit cutter engine\nwk = worker()\nwk <= './RedDream.txt'\n\nlibrary(tm)\nmycorpus <- Corpus(DirSource(\"RedDream.segment.2016-11-27_17_49_03\"), list(langue = NA))\ntdm <- TermDocumentMatrix(mycorpus, control = list(wordLengths = c(1, Inf)))\ninspect(tdm[1:200])\nmtr <- as.matrix(tdm)\nsortmtr <- sort(rowSums(mtr),decreasing=TRUE)\n\nfirstpart <- Corpus(DirSource(\"part one\"), list(langue = NA))\nsecondpart <- Corpus(DirSource(\"part two\"), list(langue = NA))\ntdm1 <- TermDocumentMatrix(firstpart, control = list(wordLengths = c(1, Inf)))\ntdm2 <- TermDocumentMatrix(secondpart, control = list(wordLengths = c(1, Inf)))\nmtr1 <- as.matrix(tdm1)\nmtr2 <- as.matrix(tdm2)\nsortmtr1 <- sort(rowSums(mtr1), decreasing=T)\nsortmtr2 <- sort(rowSums(mtr2), decreasing=T)\n\ncloud1 <- data.frame(word = names(sortmtr1), freq = sortmtr1)\ncloud2 <- data.frame(word = names(sortmtr2), freq = sortmtr2)\n\nlibrary(wordcloud)\n#Setting Chinese font on word cloud\npar(family=(\"Heiti TC Light\"))\nwordcloud(cloud1$word, cloud1$freq, min.freq = 100, random.order = F, ordered.colors = F, \n          colors = rainbow(length(row.names(mtr1))))\nwordcloud(cloud2$word, cloud2$freq, min.freq = 100, random.order = F, ordered.colors = F, \n          colors = rainbow(length(row.names(mtr2))))\n\n\n",
+    "created" : 1480599185032.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3617041309",
+    "id" : "B5D79BA9",
+    "lastKnownWriteTime" : 1480871709,
+    "last_content_update" : 1480951359658,
+    "path" : "~/R/Rjieba/Untitled.R",
+    "project_path" : "Untitled.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
